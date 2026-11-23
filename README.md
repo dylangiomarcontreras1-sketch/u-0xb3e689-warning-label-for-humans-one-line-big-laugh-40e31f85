@@ -47,6 +47,8 @@ randomness, so every run writes identical bytes.
 ```bash
 python3 main.py                 # writes /output/entry.txt
 python3 main.py out/entry.txt   # writes elsewhere, for local checks
+python3 main.py --print         # prints the line, writes nothing
+python3 main.py --check         # validates it against the gate
 ```
 
 It writes UTF-8 with no BOM, no trailing newline and no newline translation, creating

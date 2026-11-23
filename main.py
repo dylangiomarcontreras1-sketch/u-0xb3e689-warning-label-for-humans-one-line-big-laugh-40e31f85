@@ -29,8 +29,8 @@ def check(text: str) -> None:
         raise ValueError(f"entry is {len(text)} characters, over the {MAX_CHARS} cap")
     if text != text.strip():
         raise ValueError("entry must not start or end with whitespace")
-    if "\n" in text or "\r" in text:
-        raise ValueError("entry must be a single line")
+    if any(ord(char) < 0x20 or ord(char) == 0x7F for char in text):
+        raise ValueError("entry must be one printable line: no control characters")
     text.encode("utf-8")
 
 
@@ -54,11 +54,29 @@ def write(path: str, text: str) -> None:
         raise
 
 
+USAGE = """usage: main.py [OUTPUT_PATH | --print | --check]
+
+  (no argument)  write the entry line to /output/entry.txt
+  OUTPUT_PATH    write it there instead, for local checks
+  --print        print it to stdout, write nothing
+  --check        validate it against the gate, write nothing
+"""
+
+
 def main(argv: list[str]) -> int:
-    path = argv[1] if len(argv) > 1 else DEFAULT_OUTPUT
+    arg = argv[1] if len(argv) > 1 else DEFAULT_OUTPUT
     text = render()
     check(text)
-    write(path, text)
+    if arg in ("-h", "--help"):
+        print(USAGE, end="")
+        return 0
+    if arg == "--check":
+        print(f"ok: {len(text)} characters, valid")
+        return 0
+    if arg == "--print":
+        print(text)
+        return 0
+    write(arg, text)
     return 0
 
 
